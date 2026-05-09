@@ -28,7 +28,6 @@
     overflow-x: hidden;
   }
 
-  /* Starfield background */
   body::before {
     content: '';
     position: fixed;
@@ -51,7 +50,6 @@
     z-index: 1;
   }
 
-  /* Header */
   header {
     text-align: center;
     padding: 30px 0 20px;
@@ -91,7 +89,47 @@
     letter-spacing: 1px;
   }
 
-  /* Status badge */
+  /* Page tabs */
+  .page-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 4px;
+  }
+
+  .page-tab {
+    flex: 1;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    color: var(--sub);
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: center;
+  }
+
+  .page-tab:hover { color: var(--text); }
+
+  .page-tab.active-virtual {
+    background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.08));
+    color: var(--accent);
+    border: 1px solid rgba(245,158,11,0.3);
+  }
+
+  .page-tab.active-real {
+    background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.08));
+    color: var(--green);
+    border: 1px solid rgba(16,185,129,0.3);
+  }
+
+  /* Status */
   .status-row {
     display: flex;
     align-items: center;
@@ -107,20 +145,14 @@
     flex-shrink: 0;
   }
 
-  .status-dot.connected {
-    background: var(--green);
-    box-shadow: 0 0 8px var(--green);
-    animation: pulse 2s infinite;
-  }
+  .status-dot.demo { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+  .status-dot.connected { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
 
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
   .status-text { font-size: 0.85rem; color: var(--sub); }
 
-  /* Main cards */
+  /* Cards */
   .cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -128,9 +160,7 @@
     margin-bottom: 24px;
   }
 
-  @media (max-width: 600px) {
-    .cards { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 600px) { .cards { grid-template-columns: 1fr; } }
 
   .card {
     background: var(--panel);
@@ -154,172 +184,65 @@
   .card.voltage::before { background: linear-gradient(90deg, var(--accent), #fcd34d); }
   .card.current::before { background: linear-gradient(90deg, var(--accent2), #93c5fd); }
 
-  .card-label {
-    font-size: 0.75rem;
-    letter-spacing: 2px;
-    color: var(--sub);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  .card-icon {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 1.8rem;
-    opacity: 0.15;
-  }
-
-  .card-value {
-    font-family: 'Orbitron', monospace;
-    font-size: 3rem;
-    font-weight: 900;
-    line-height: 1;
-  }
-
+  .card-label { font-size: 0.75rem; letter-spacing: 2px; color: var(--sub); text-transform: uppercase; margin-bottom: 8px; }
+  .card-icon { position: absolute; top: 20px; left: 20px; font-size: 1.8rem; opacity: 0.15; }
+  .card-value { font-family: 'Orbitron', monospace; font-size: 3rem; font-weight: 900; line-height: 1; }
   .card.voltage .card-value { color: var(--accent); }
   .card.current .card-value { color: var(--accent2); }
-
-  .card-unit {
-    font-family: 'Orbitron', monospace;
-    font-size: 1rem;
-    color: var(--sub);
-    margin-top: 4px;
-  }
+  .card-unit { font-family: 'Orbitron', monospace; font-size: 1rem; color: var(--sub); margin-top: 4px; }
 
   .card-extra {
-    margin-top: 14px;
-    font-size: 0.8rem;
-    color: var(--sub);
-    border-top: 1px solid var(--border);
-    padding-top: 10px;
-    display: flex;
-    justify-content: space-between;
+    margin-top: 14px; font-size: 0.8rem; color: var(--sub);
+    border-top: 1px solid var(--border); padding-top: 10px; display: flex; justify-content: space-between;
   }
-
   .card-extra span { color: var(--text); font-weight: 600; }
 
-  /* Power card */
+  /* Power */
   .power-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 24px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+    padding: 24px; margin-bottom: 24px; text-align: center; position: relative; overflow: hidden;
   }
-
   .power-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
+    content: ''; position: absolute; inset: 0;
     background: radial-gradient(ellipse at center, rgba(245,158,11,0.06) 0%, transparent 70%);
   }
-
-  .power-label {
-    font-size: 0.75rem;
-    letter-spacing: 2px;
-    color: var(--sub);
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
+  .power-label { font-size: 0.75rem; letter-spacing: 2px; color: var(--sub); text-transform: uppercase; margin-bottom: 6px; }
   .power-value {
-    font-family: 'Orbitron', monospace;
-    font-size: 2.5rem;
-    font-weight: 900;
+    font-family: 'Orbitron', monospace; font-size: 2.5rem; font-weight: 900;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
 
-  /* Gauge bar */
-  .gauge {
-    margin-top: 16px;
-  }
-
-  .gauge-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75rem;
-    color: var(--sub);
-    margin-bottom: 6px;
-  }
-
-  .gauge-track {
-    height: 8px;
-    background: var(--bg);
-    border-radius: 4px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-  }
-
-  .gauge-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.5s ease;
-  }
-
+  /* Gauge */
+  .gauge { margin-top: 16px; }
+  .gauge-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--sub); margin-bottom: 6px; }
+  .gauge-track { height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+  .gauge-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
   .gauge-fill.volt { background: linear-gradient(90deg, var(--accent), #fcd34d); }
   .gauge-fill.amp { background: linear-gradient(90deg, var(--accent2), #93c5fd); }
 
   /* Chart */
   .chart-box {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 24px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+    padding: 20px; margin-bottom: 24px;
   }
-
   .chart-title {
-    font-size: 0.8rem;
-    letter-spacing: 2px;
-    color: var(--sub);
-    text-transform: uppercase;
-    margin-bottom: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    font-size: 0.8rem; letter-spacing: 2px; color: var(--sub); text-transform: uppercase;
+    margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;
   }
-
   .chart-legend { display: flex; gap: 16px; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--sub); }
   .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
-
   canvas { width: 100% !important; }
 
   /* Alert */
-  .alert {
-    padding: 12px 18px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    margin-bottom: 16px;
-    display: none;
-    align-items: center;
-    gap: 10px;
-  }
-
+  .alert { padding: 12px 18px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 16px; display: none; align-items: center; gap: 10px; }
   .alert.show { display: flex; }
   .alert.warn { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: var(--accent); }
   .alert.err { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: var(--red); }
 
-  /* Demo mode toggle */
-  .demo-note {
-    text-align: center;
-    color: var(--sub);
-    font-size: 0.78rem;
-    margin-top: 10px;
-    letter-spacing: 0.5px;
-  }
-
-  .demo-note a {
-    color: var(--accent);
-    cursor: pointer;
-    text-decoration: none;
+  .page-note {
+    text-align: center; color: var(--sub); font-size: 0.78rem; margin-top: 10px; letter-spacing: 0.5px;
   }
 </style>
 </head>
@@ -343,10 +266,16 @@
     <p>نظام متابعة الطاقة الشمسية — ESP32</p>
   </header>
 
+  <!-- Page Tabs -->
+  <div class="page-tabs">
+    <button class="page-tab active-virtual" id="tabVirtual" onclick="switchPage('virtual')">محاكاة افتراضية</button>
+    <button class="page-tab" id="tabReal" onclick="switchPage('real')">بيانات حقيقية</button>
+  </div>
+
   <!-- Status -->
   <div class="status-row">
-    <div class="status-dot" id="statusDot"></div>
-    <span class="status-text" id="statusText">جاري الاتصال بالخادم...</span>
+    <div class="status-dot demo" id="statusDot"></div>
+    <span class="status-text" id="statusText">محاكاة — بيانات افتراضية</span>
   </div>
 
   <!-- Alert -->
@@ -407,118 +336,161 @@
     <canvas id="chart" height="160"></canvas>
   </div>
 
-  <div class="demo-note" id="demoNote">
-    في وضع العرض التجريبي — البيانات محاكاة. يتم الاتصال بالخادم تلقائياً عند توفر البيانات الحقيقية.
-  </div>
+  <div class="page-note" id="pageNote">محاكاة افتراضية لنظام طاقة شمسية — البيانات غير حقيقية</div>
 </div>
 
 <script>
-// ---- Chart setup ----
 const canvas = document.getElementById('chart');
 const ctx = canvas.getContext('2d');
-
 const MAX_POINTS = 60;
-const history = { time: [], voltage: [], current: [] };
+
+const pages = {
+  virtual: { history: { time: [], voltage: [], current: [] }, stats: { voltMin: Infinity, voltMax: -Infinity, currMin: Infinity, currMax: -Infinity } },
+  real:    { history: { time: [], voltage: [], current: [] }, stats: { voltMin: Infinity, voltMax: -Infinity, currMin: Infinity, currMax: -Infinity } }
+};
+
+let currentPage = 'virtual';
+let demoTimer = null;
+let fetchTimer = null;
+let demoPhase = 0;
+let isLive = false;
+
+function switchPage(page) {
+  if (page === currentPage) return;
+  currentPage = page;
+
+  document.getElementById('tabVirtual').className = 'page-tab' + (page === 'virtual' ? ' active-virtual' : '');
+  document.getElementById('tabReal').className = 'page-tab' + (page === 'real' ? ' active-real' : '');
+
+  if (page === 'virtual') {
+    stopFetch();
+    startDemo();
+    document.getElementById('statusDot').className = 'status-dot demo';
+    document.getElementById('statusText').textContent = 'محاكاة — بيانات افتراضية';
+    document.getElementById('pageNote').textContent = 'محاكاة افتراضية لنظام طاقة شمسية — البيانات غير حقيقية';
+  } else {
+    stopDemo();
+    isLive = false;
+    startFetch();
+    document.getElementById('statusDot').className = 'status-dot';
+    document.getElementById('statusText').textContent = 'جاري الاتصال بالخادم...';
+    document.getElementById('pageNote').textContent = 'بيانات حقيقية من ESP32 عبر الخادم';
+  }
+
+  resetDisplay();
+  restorePageData();
+}
+
+function resetDisplay() {
+  document.getElementById('voltVal').textContent = '--.-';
+  document.getElementById('currVal').textContent = '--.-';
+  document.getElementById('powerVal').textContent = '--- W';
+  document.getElementById('voltBar').style.width = '0%';
+  document.getElementById('currBar').style.width = '0%';
+  document.getElementById('voltMin').textContent = '--';
+  document.getElementById('voltMaxVal').textContent = '--';
+  document.getElementById('currMin').textContent = '--';
+  document.getElementById('currMaxVal').textContent = '--';
+  document.getElementById('alertBox').className = 'alert';
+}
+
+function restorePageData() {
+  const p = pages[currentPage];
+  if (p.history.voltage.length > 0) {
+    const last = p.history.voltage.length - 1;
+    document.getElementById('voltVal').textContent = p.history.voltage[last].toFixed(1);
+    document.getElementById('currVal').textContent = p.history.current[last].toFixed(2);
+    document.getElementById('powerVal').textContent = (p.history.voltage[last] * p.history.current[last]).toFixed(1) + ' W';
+    document.getElementById('voltBar').style.width = Math.min(100, (p.history.voltage[last] / 25) * 100) + '%';
+    document.getElementById('currBar').style.width = Math.min(100, (p.history.current[last] / 10) * 100) + '%';
+  }
+  if (p.stats.voltMin !== Infinity) {
+    document.getElementById('voltMin').textContent = p.stats.voltMin.toFixed(1);
+    document.getElementById('voltMaxVal').textContent = p.stats.voltMax.toFixed(1);
+    document.getElementById('currMin').textContent = p.stats.currMin.toFixed(2);
+    document.getElementById('currMaxVal').textContent = p.stats.currMax.toFixed(2);
+  }
+  drawChart();
+}
 
 function drawChart() {
+  const p = pages[currentPage];
   const W = canvas.offsetWidth;
   const H = canvas.offsetHeight || 160;
   canvas.width = W * devicePixelRatio;
   canvas.height = H * devicePixelRatio;
   ctx.scale(devicePixelRatio, devicePixelRatio);
-
   ctx.clearRect(0, 0, W, H);
 
-  if (history.voltage.length < 2) return;
+  if (p.history.voltage.length < 2) return;
 
   const pad = { top: 10, right: 10, bottom: 20, left: 10 };
   const cw = W - pad.left - pad.right;
   const ch = H - pad.top - pad.bottom;
 
-  // Grid
   ctx.strokeStyle = 'rgba(255,255,255,0.04)';
   ctx.lineWidth = 1;
   for (let i = 0; i <= 4; i++) {
     const y = pad.top + (ch / 4) * i;
-    ctx.beginPath();
-    ctx.moveTo(pad.left, y);
-    ctx.lineTo(pad.left + cw, y);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + cw, y); ctx.stroke();
   }
 
-  const n = history.voltage.length;
+  const n = p.history.voltage.length;
 
   function drawLine(data, color, maxVal) {
     const grd = ctx.createLinearGradient(0, pad.top, 0, pad.top + ch);
     grd.addColorStop(0, color.replace(')', ', 0.3)').replace('rgb', 'rgba'));
     grd.addColorStop(1, color.replace(')', ', 0)').replace('rgb', 'rgba'));
-
     ctx.beginPath();
     for (let i = 0; i < n; i++) {
       const x = pad.left + (i / (MAX_POINTS - 1)) * cw;
       const y = pad.top + ch - (data[i] / maxVal) * ch;
       i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
     }
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // fill
+    ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
     ctx.lineTo(pad.left + ((n-1) / (MAX_POINTS - 1)) * cw, pad.top + ch);
     ctx.lineTo(pad.left, pad.top + ch);
-    ctx.closePath();
-    ctx.fillStyle = grd;
-    ctx.fill();
+    ctx.closePath(); ctx.fillStyle = grd; ctx.fill();
   }
 
-  const maxV = Math.max(25, ...history.voltage) * 1.1;
-  const maxA = Math.max(10, ...history.current) * 1.1;
-
-  // Normalize current to voltage scale for visual
-  const normalizedCurr = history.current.map(a => (a / maxA) * maxV);
-
-  drawLine(history.voltage, '#f59e0b', maxV);
-  drawLine(normalizedCurr, '#3b82f6', maxV);
+  const maxV = Math.max(25, ...p.history.voltage) * 1.1;
+  const maxA = Math.max(10, ...p.history.current) * 1.1;
+  drawLine(p.history.voltage, '#f59e0b', maxV);
+  drawLine(p.history.current.map(a => (a / maxA) * maxV), '#3b82f6', maxV);
 }
-
-// ---- Stats tracking ----
-let stats = { voltMin: Infinity, voltMax: -Infinity, currMin: Infinity, currMax: -Infinity };
 
 function updateDisplay(voltage, current) {
   const power = voltage * current;
+  const p = pages[currentPage];
 
   document.getElementById('voltVal').textContent = voltage.toFixed(1);
   document.getElementById('currVal').textContent = current.toFixed(2);
   document.getElementById('powerVal').textContent = power.toFixed(1) + ' W';
 
-  // Gauges
   const voltMax = parseFloat(document.getElementById('voltMax').textContent);
   const currMax = parseFloat(document.getElementById('currMax').textContent);
   document.getElementById('voltBar').style.width = Math.min(100, (voltage / voltMax) * 100) + '%';
   document.getElementById('currBar').style.width = Math.min(100, (current / currMax) * 100) + '%';
 
-  // Stats
-  stats.voltMin = Math.min(stats.voltMin, voltage);
-  stats.voltMax = Math.max(stats.voltMax, voltage);
-  stats.currMin = Math.min(stats.currMin, current);
-  stats.currMax = Math.max(stats.currMax, current);
-  document.getElementById('voltMin').textContent = stats.voltMin.toFixed(1);
-  document.getElementById('voltMaxVal').textContent = stats.voltMax.toFixed(1);
-  document.getElementById('currMin').textContent = stats.currMin.toFixed(2);
-  document.getElementById('currMaxVal').textContent = stats.currMax.toFixed(2);
+  p.stats.voltMin = Math.min(p.stats.voltMin, voltage);
+  p.stats.voltMax = Math.max(p.stats.voltMax, voltage);
+  p.stats.currMin = Math.min(p.stats.currMin, current);
+  p.stats.currMax = Math.max(p.stats.currMax, current);
+  document.getElementById('voltMin').textContent = p.stats.voltMin.toFixed(1);
+  document.getElementById('voltMaxVal').textContent = p.stats.voltMax.toFixed(1);
+  document.getElementById('currMin').textContent = p.stats.currMin.toFixed(2);
+  document.getElementById('currMaxVal').textContent = p.stats.currMax.toFixed(2);
 
-  // History
   const now = new Date().toLocaleTimeString('ar-IQ');
-  history.time.push(now);
-  history.voltage.push(voltage);
-  history.current.push(current);
-  if (history.time.length > MAX_POINTS) {
-    history.time.shift(); history.voltage.shift(); history.current.shift();
+  p.history.time.push(now);
+  p.history.voltage.push(voltage);
+  p.history.current.push(current);
+  if (p.history.time.length > MAX_POINTS) {
+    p.history.time.shift(); p.history.voltage.shift(); p.history.current.shift();
   }
 
   drawChart();
 
-  // Alerts
   const alertBox = document.getElementById('alertBox');
   if (voltage > 24) {
     alertBox.className = 'alert show err';
@@ -531,15 +503,10 @@ function updateDisplay(voltage, current) {
   }
 }
 
-// ---- Demo simulation ----
-let demoTimer = null;
-let demoPhase = 0;
-let isLive = false;
-
+// ---- Demo ----
 function startDemo() {
   if (demoTimer) return;
   demoPhase = 0;
-  document.getElementById('demoNote').style.display = 'block';
   demoTimer = setInterval(() => {
     demoPhase += 0.05;
     const voltage = 12 + 8 * Math.abs(Math.sin(demoPhase * 0.3)) + (Math.random() - 0.5) * 0.5;
@@ -549,20 +516,23 @@ function startDemo() {
 }
 
 function stopDemo() {
-  if (demoTimer) {
-    clearInterval(demoTimer);
-    demoTimer = null;
-  }
+  if (demoTimer) { clearInterval(demoTimer); demoTimer = null; }
 }
 
-// ---- Auto-connect to server ----
-let fetchTimer = null;
+// ---- Real data fetch ----
+function startFetch() {
+  fetchServer();
+  fetchTimer = setInterval(fetchServer, 2000);
+}
+
+function stopFetch() {
+  if (fetchTimer) { clearInterval(fetchTimer); fetchTimer = null; }
+}
 
 async function fetchServer() {
   try {
     const res = await fetch('/api/data', { signal: AbortSignal.timeout(5000) });
     const data = await res.json();
-
     if (data.error) throw new Error(data.error);
 
     const voltage = parseFloat(data.voltage) || 0;
@@ -570,11 +540,9 @@ async function fetchServer() {
 
     if (!isLive) {
       isLive = true;
-      stopDemo();
-      stats = { voltMin: Infinity, voltMax: -Infinity, currMin: Infinity, currMax: -Infinity };
-      document.getElementById('statusDot').classList.add('connected');
-      document.getElementById('demoNote').style.display = 'none';
     }
+
+    document.getElementById('statusDot').className = 'status-dot connected';
 
     if (data.status === 'waiting') {
       document.getElementById('statusText').textContent = 'متصل بالخادم — بانتظار بيانات ESP32...';
@@ -586,17 +554,17 @@ async function fetchServer() {
       updateDisplay(voltage, current);
     }
   } catch (e) {
-    if (!isLive && !demoTimer) {
-      startDemo();
+    if (isLive) {
+      isLive = false;
+      document.getElementById('statusDot').className = 'status-dot';
     }
-    document.getElementById('statusText').textContent = 'وضع العرض التجريبي — جاري إعادة الاتصال بالخادم...';
+    document.getElementById('statusText').textContent = 'غير متصل — جاري إعادة الاتصال...';
   }
 }
 
 // ---- Init ----
 startDemo();
-fetchServer();
-fetchTimer = setInterval(fetchServer, 2000);
+
 window.addEventListener('resize', drawChart);
 </script>
 </body>
