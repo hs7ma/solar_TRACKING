@@ -1,0 +1,16 @@
+{
+  "name": "solar-tracker-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Solar Tracker Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
