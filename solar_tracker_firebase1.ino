@@ -1,12 +1,11 @@
 // ============================================
-//   نظام تتبع الشمس الذكي - مع Server
-//   Solar Tracker + Server Dashboard
+//   نظام تتبع الشمس الذكي - مع Firebase
+//   Solar Tracker + Firebase Dashboard
 // ============================================
 
 #include <ESP32Servo.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
-#include <WiFiClientSecure.h>
 
 // ============================================
 // ⚙️  غيّر هذه الإعدادات فقط
@@ -14,12 +13,8 @@
 const char* ssid     = "SOFY";
 const char* password = "sofy.7247";
 
-// رابط السيرفر - غيّره بعد النشر
-const char* SERVER_URL = "https://YOUR-PROJECT.up.railway.app/api/data";
+const char* FIREBASE_URL = "https://solar-tracker-14418-default-rtdb.europe-west1.firebasedatabase.app/station1.json";
 // ============================================
-
-// --- عميل HTTPS ---
-WiFiClientSecure secureClient;
 
 // --- تعريف محركات السيرفو ---
 Servo servoPan;
@@ -58,13 +53,13 @@ float power_W        = 0.0;
 int   ldr_tl = 0, ldr_tr = 0, ldr_bl = 0, ldr_br = 0;
 
 // ============================================
-// 📡 إرسال البيانات إلى السيرفر
+// 🔥 إرسال البيانات إلى Firebase
 // ============================================
-void sendToServer() {
+void sendToFirebase() {
   if (WiFi.status() != WL_CONNECTED) return;
 
   HTTPClient http;
-  http.begin(secureClient, SERVER_URL);
+  http.begin(FIREBASE_URL);
   http.addHeader("Content-Type", "application/json");
   http.setTimeout(3000);
 
@@ -80,12 +75,12 @@ void sendToServer() {
   json += "\"ldrBR\":"     + String(ldr_br);
   json += "}";
 
-  int code = http.POST(json);
+  int code = http.PUT(json);
 
   if (code > 0) {
-    Serial.println("✅ Server: تم الإرسال بنجاح (code: " + String(code) + ")");
+    Serial.println("✅ Firebase: تم الإرسال بنجاح (code: " + String(code) + ")");
   } else {
-    Serial.println("❌ Server: فشل الإرسال (error: " + String(code) + ")");
+    Serial.println("❌ Firebase: فشل الإرسال (error: " + String(code) + ")");
   }
 
   http.end();
@@ -126,12 +121,10 @@ void setup() {
     Serial.println("\n✅ تم الاتصال بالـ WiFi!");
     Serial.print("📡 عنوان IP: ");
     Serial.println(WiFi.localIP());
-    Serial.println("📡 سيتم الإرسال إلى السيرفر كل ثانيتين");
+    Serial.println("🔥 سيتم الإرسال إلى Firebase كل ثانيتين");
   } else {
     Serial.println("\n❌ فشل الاتصال - الجهاز يعمل بدون WiFi");
   }
-
-  secureClient.setInsecure();
 
   Serial.println("تم بدء النظام...");
 }
@@ -170,9 +163,9 @@ void loop() {
   servoTilt.write(tiltAngle);
   servoPan.write(panAngle);
 
-// -----------------------------------------
-// 2. قراءة الفولتية والتيار + إرسال للسيرفر
-// -----------------------------------------
+  // -----------------------------------------
+  // 2. قراءة الفولتية والتيار + إرسال Firebase
+  // -----------------------------------------
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= sendInterval) {
     previousMillis = currentMillis;
@@ -202,8 +195,8 @@ void loop() {
     Serial.print("Tilt Angle:  "); Serial.println(tiltAngle);
     Serial.println("=============================");
 
-    // 📡 إرسال إلى السيرفر
-    sendToServer();
+    // 🔥 إرسال إلى Firebase
+    sendToFirebase();
 
     // إعادة الاتصال إذا انقطع WiFi
     if (WiFi.status() != WL_CONNECTED) {
