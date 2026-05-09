@@ -11,11 +11,11 @@
 // ============================================
 // ⚙️  غيّر هذه الإعدادات فقط
 // ============================================
-const char* ssid     = "SOFY";
-const char* password = "sofy.7247";
+const char* ssid     = "MSR3";
+const char* password = "60006000";
 
 // رابط السيرفر - غيّره بعد النشر
-const char* SERVER_URL = "https://YOUR-PROJECT.up.railway.app/api/data";
+const char* SERVER_URL = "https://solartracking-production.up.railway.app/api/data";
 // ============================================
 
 // --- عميل HTTPS ---
@@ -57,6 +57,19 @@ float actual_current = 0.0;
 float power_W        = 0.0;
 int   ldr_tl = 0, ldr_tr = 0, ldr_bl = 0, ldr_br = 0;
 
+// --- عدد عينات المتوسط للـ ADC ---
+const int ADC_SAMPLES = 16;
+
+// --- قراءة ADC مع متوسط عينات ---
+int readADCavg(int pin) {
+  long sum = 0;
+  for (int i = 0; i < ADC_SAMPLES; i++) {
+    sum += analogRead(pin);
+    delayMicroseconds(200);
+  }
+  return (int)(sum / ADC_SAMPLES);
+}
+
 // ============================================
 // 📡 إرسال البيانات إلى السيرفر
 // ============================================
@@ -94,6 +107,10 @@ void sendToServer() {
 // ============================================
 void setup() {
   Serial.begin(115200);
+
+  // تهيئة ADC
+  analogSetAttenuation(ADC_11db);
+  analogSetWidth(12);
 
   // تهيئة محركات السيرفو
   ESP32PWM::allocateTimer(0);
@@ -154,14 +171,14 @@ void loop() {
 
   // الحركة العمودية
   if (abs(avgTop - avgBot) > tolerance) {
-    if (avgTop > avgBot) { tiltAngle--; }
-    else                 { tiltAngle++; }
+    if (avgTop > avgBot) { tiltAngle++; }
+    else                 { tiltAngle--; }
   }
 
   // الحركة الأفقية
   if (abs(avgLeft - avgRight) > tolerance) {
-    if (avgLeft > avgRight) { panAngle++; }
-    else                    { panAngle--; }
+    if (avgLeft > avgRight) { panAngle--; }
+    else                    { panAngle++; }
   }
 
   tiltAngle = constrain(tiltAngle, 10, 170);
@@ -178,12 +195,12 @@ void loop() {
     previousMillis = currentMillis;
 
     // --- حساب الفولتية ---
-    int adc_v = analogRead(voltagePin);
+    int adc_v = readADCavg(voltagePin);
     float v_pin = (adc_v * 3.3) / 4095.0;
     actual_voltage = v_pin * 5.0;
 
     // --- حساب التيار ---
-    int adc_c = analogRead(currentPin);
+    int adc_c = readADCavg(currentPin);
     float c_pin = (adc_c * 3.3) / 4095.0;
     actual_current = (c_pin - 1.65) / 0.185;
 
