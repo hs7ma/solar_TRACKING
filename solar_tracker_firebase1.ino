@@ -55,12 +55,14 @@ int   ldr_tl = 0, ldr_tr = 0, ldr_bl = 0, ldr_br = 0;
 // --- عدد عينات المتوسط للـ ADC ---
 const int ADC_SAMPLES = 16;
 
-// --- قراءة ADC مع متوسط عينات ---
+// --- قراءة ADC مع تجاهل اول عينة + متوسط ---
 int readADCavg(int pin) {
+  analogRead(pin);
+  delay(1);
   long sum = 0;
   for (int i = 0; i < ADC_SAMPLES; i++) {
     sum += analogRead(pin);
-    delayMicroseconds(200);
+    delayMicroseconds(500);
   }
   return (int)(sum / ADC_SAMPLES);
 }
@@ -195,7 +197,7 @@ void loop() {
     // --- حساب التيار ---
     int adc_c = readADCavg(currentPin);
     float c_pin = (adc_c * 3.3) / 4095.0;
-    actual_current = (c_pin - 1.65) / 0.185;
+    actual_current = (c_pin - 2.5) / 0.185;
 
     if (actual_current < 0.05 && actual_current > -0.05) {
       actual_current = 0.0;
@@ -205,8 +207,12 @@ void loop() {
 
     // طباعة على Serial Monitor
     Serial.println("=============================");
-    Serial.print("الفولتية (V): "); Serial.println(actual_voltage, 2);
-    Serial.print("التيار (A):  "); Serial.println(abs(actual_current), 2);
+    Serial.print("ADC_V raw: ");    Serial.print(adc_v);
+    Serial.print(" | V_pin: ");      Serial.print(v_pin, 3);
+    Serial.print("V | الفولتية: ");  Serial.println(actual_voltage, 2);
+    Serial.print("ADC_C raw: ");    Serial.print(adc_c);
+    Serial.print(" | C_pin: ");      Serial.print(c_pin, 3);
+    Serial.print("V | التيار: ");     Serial.println(abs(actual_current), 2);
     Serial.print("الطاقة (W):  "); Serial.println(power_W, 2);
     Serial.print("Pan Angle:   "); Serial.println(panAngle);
     Serial.print("Tilt Angle:  "); Serial.println(tiltAngle);
