@@ -91,69 +91,6 @@
     letter-spacing: 1px;
   }
 
-  /* Connection config */
-  .config-box {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 24px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: flex-end;
-  }
-
-  .field {
-    flex: 1;
-    min-width: 180px;
-  }
-
-  label {
-    display: block;
-    font-size: 0.75rem;
-    color: var(--sub);
-    margin-bottom: 6px;
-    letter-spacing: 1px;
-  }
-
-  input, select {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    color: var(--text);
-    font-family: 'Cairo', sans-serif;
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  input:focus, select:focus {
-    border-color: var(--accent);
-  }
-
-  .connect-btn {
-    padding: 10px 28px;
-    background: linear-gradient(135deg, var(--accent), #d97706);
-    border: none;
-    border-radius: 8px;
-    color: #000;
-    font-family: 'Orbitron', monospace;
-    font-weight: 700;
-    font-size: 0.85rem;
-    cursor: pointer;
-    letter-spacing: 1px;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .connect-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 20px rgba(245,158,11,0.4);
-  }
-
   /* Status badge */
   .status-row {
     display: flex;
@@ -406,19 +343,10 @@
     <p>نظام متابعة الطاقة الشمسية — ESP32</p>
   </header>
 
-  <!-- Config -->
-  <div class="config-box">
-    <div class="field" style="max-width:150px">
-      <label>التحديث (ثانية)</label>
-      <input id="interval" type="number" min="1" max="60" value="2">
-    </div>
-    <button class="connect-btn" onclick="toggleConnect()">اتصال</button>
-  </div>
-
   <!-- Status -->
   <div class="status-row">
     <div class="status-dot" id="statusDot"></div>
-    <span class="status-text" id="statusText">غير متصل — وضع العرض التجريبي نشط</span>
+    <span class="status-text" id="statusText">جاري الاتصال بالخادم...</span>
   </div>
 
   <!-- Alert -->
@@ -479,9 +407,8 @@
     <canvas id="chart" height="160"></canvas>
   </div>
 
-  <div class="demo-note">
-    في وضع التجريبي، البيانات محاكاة. لاستقبال البيانات الفعلية أدخل رابط الخادم واضغط <strong>اتصال</strong>.<br>
-    يجب أن يُرسل ESP32 بيانات JSON بصيغة POST إلى <a>/api/data</a>
+  <div class="demo-note" id="demoNote">
+    في وضع العرض التجريبي — البيانات محاكاة. يتم الاتصال بالخادم تلقائياً عند توفر البيانات الحقيقية.
   </div>
 </div>
 
@@ -607,11 +534,14 @@ function updateDisplay(voltage, current) {
 // ---- Demo simulation ----
 let demoTimer = null;
 let demoPhase = 0;
+let isLive = false;
 
 function startDemo() {
+  if (demoTimer) return;
+  demoPhase = 0;
+  document.getElementById('demoNote').style.display = 'block';
   demoTimer = setInterval(() => {
     demoPhase += 0.05;
-    // Simulate a solar tracker curve - rises and falls
     const voltage = 12 + 8 * Math.abs(Math.sin(demoPhase * 0.3)) + (Math.random() - 0.5) * 0.5;
     const current = 1 + 4 * Math.abs(Math.sin(demoPhase * 0.3)) + (Math.random() - 0.5) * 0.2;
     updateDisplay(voltage, current);
@@ -619,32 +549,31 @@ function startDemo() {
 }
 
 function stopDemo() {
-  clearInterval(demoTimer);
-  demoTimer = null;
+  if (demoTimer) {
+    clearInterval(demoTimer);
+    demoTimer = null;
+  }
 }
 
-// ---- Real Server connection ----
+// ---- Auto-connect to server ----
 let fetchTimer = null;
-let isConnected = false;
-let fetchActive = false;
 
 async function fetchServer() {
   try {
     const res = await fetch('/api/data', { signal: AbortSignal.timeout(5000) });
     const data = await res.json();
 
-    if (data.error) {
-      throw new Error(data.error);
-    }
+    if (data.error) throw new Error(data.error);
 
     const voltage = parseFloat(data.voltage) || 0;
     const current = parseFloat(data.current) || 0;
 
-    if (!isConnected) {
-      isConnected = true;
+    if (!isLive) {
+      isLive = true;
       stopDemo();
+      stats = { voltMin: Infinity, voltMax: -Infinity, currMin: Infinity, currMax: -Infinity };
       document.getElementById('statusDot').classList.add('connected');
-      document.getElementById('statusText').textContent = 'متصل بالخادم — جاري استقبال البيانات';
+      document.getElementById('demoNote').style.display = 'none';
     }
 
     if (data.status === 'waiting') {
@@ -657,37 +586,17 @@ async function fetchServer() {
       updateDisplay(voltage, current);
     }
   } catch (e) {
-    if (isConnected) {
-      isConnected = false;
-      document.getElementById('statusDot').classList.remove('connected');
-      document.getElementById('statusText').textContent = 'انقطع الاتصال — إعادة المحاولة...';
+    if (!isLive && !demoTimer) {
       startDemo();
     }
-  }
-}
-
-function toggleConnect() {
-  const btn = document.querySelector('.connect-btn');
-  if (!fetchActive) {
-    fetchActive = true;
-    btn.textContent = 'قطع الاتصال';
-    stopDemo();
-    const sec = parseInt(document.getElementById('interval').value) * 1000 || 2000;
-    fetchServer();
-    fetchTimer = setInterval(fetchServer, sec);
-  } else {
-    fetchActive = false;
-    isConnected = false;
-    clearInterval(fetchTimer);
-    btn.textContent = 'اتصال';
-    document.getElementById('statusDot').classList.remove('connected');
-    document.getElementById('statusText').textContent = 'غير متصل — وضع العرض التجريبي نشط';
-    startDemo();
+    document.getElementById('statusText').textContent = 'وضع العرض التجريبي — جاري إعادة الاتصال بالخادم...';
   }
 }
 
 // ---- Init ----
 startDemo();
+fetchServer();
+fetchTimer = setInterval(fetchServer, 2000);
 window.addEventListener('resize', drawChart);
 </script>
 </body>
